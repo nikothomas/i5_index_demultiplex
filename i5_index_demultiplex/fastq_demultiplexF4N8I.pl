@@ -92,7 +92,7 @@ do {
             $rec2 .= $line2;
         }
     }
-    
+
 } until(eof IN1 || eof IN2);
 write_records();
 
