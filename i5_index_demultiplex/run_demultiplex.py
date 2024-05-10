@@ -24,11 +24,9 @@ os.chdir('./Raw Sequences')
 # Create the '../i5_demultiplexed_sequences' directory if it doesn't exist
 demux_dir = '../Demultiplexed Sequences'
 os.makedirs(demux_dir, exist_ok=True)
-global progress
 progress = 0
-global num_processed
 num_processed = 0
-def process_line(barcode_line, num_to_process):
+def process_line(barcode_line):
     global num_processed
     global progress
     name, file_name, idx1, seq1, idx2, seq2 = barcode_line.split("\t")
@@ -39,8 +37,6 @@ def process_line(barcode_line, num_to_process):
                   seq2 + " " +
                   name + "_" + seq2 +
                   " 2>> ../logs/i5_index_demultiplex_log.txt")
-        num_processed += 1
-        progress = num_processed / num_to_process * 100
         print(f"\rProgress: [{'#' * int(progress / 2)}{'-' * (50 - int(progress / 2))}] {progress:.2f}%", end='', flush=True)
         # Rename and move the demultiplexed files to the '../i5_demultiplexed_sequences' directory
         for file in os.listdir():
@@ -58,10 +54,6 @@ def process_line(barcode_line, num_to_process):
                         f_out.writelines(f_in)
                 # Remove the original uncompressed file
                 os.remove(file)
-                num_processed + 1
-                progress = num_processed / num_to_process * 100
-                print(f"\rProgress: [{'#' * int(progress / 2)}{'-' * (50 - int(progress / 2))}] {progress:.2f}%", end='', flush=True)
-
     else:
         print("File(s) do not exist: " + file_name)
 
@@ -78,4 +70,7 @@ while 1:
         lines.append(line)
 
 for line in lines:
-    process_line(line, len(lines) * 2)
+    process_line(line)
+    num_processed += 1
+    progress = num_processed / len(lines) * 100
+    print(f"\rProgress: [{'#' * int(progress / 2)}{'-' * (50 - int(progress / 2))}] {progress:.2f}%", end='', flush=True)
